@@ -31,7 +31,7 @@ public class Utils
 
   public static SharedPreferences getDefSharedPref(Context c)
   {
-    if (sp == null)
+    if(sp == null)
       sp = PreferenceManager.getDefaultSharedPreferences(c);
     return sp;
   }
@@ -47,25 +47,24 @@ public class Utils
   public static void onPreferenceClick(Activity activity, Preference p)
   {
     String key = p.getKey();
-    if (!key.startsWith("editor_syntax_"))
+    if(!key.startsWith("editor_syntax_"))
       return;
     int color = 0;
     boolean errorColor = false;
     try
     {
       color = Color.parseColor(getDefSharedPref(activity).getString(key, null));
-    }
-    catch (Exception e)
+    }catch(Exception e)
     {
       errorColor = true;
     }
-    if (errorColor)
+    if(errorColor)
     {
       key = key.substring(14);
       int endIndex = key.lastIndexOf("_light");
       boolean isLight = endIndex >= 0;
-      if (isLight) key = key.substring(0, endIndex);
-      switch (key)
+      if(isLight) key = key.substring(0, endIndex);
+      switch(key)
       {
         case "plain":
           color = m.j6.getDefColor(activity, isLight);
@@ -119,7 +118,7 @@ public class Utils
   public static int getSyntaxColor(Context c, String type, boolean isLight, int defColor)
   {
     String key = "editor_syntax_";
-    switch (type)
+    switch(type)
     {
       case "Plain":
       case "Keyword":
@@ -144,12 +143,11 @@ public class Utils
         key += "separator";
         break;
     }
-    if (isLight) key += "_light";
+    if(isLight) key += "_light";
     try
     {
       defColor = Color.parseColor(getDefSharedPref(c).getString(key, null));
-    }
-    catch (Exception e)
+    }catch(Exception e)
     {
     }
     return defColor;
@@ -164,13 +162,13 @@ public class Utils
         "Ok", new DialogInterface.OnClickListener()
         {
           MainActivity activity;
-          
+
           public DialogInterface.OnClickListener setData(MainActivity ma)
           {
             activity = ma;
             return this;
           }
-          
+
           @Override
           public void onClick(DialogInterface p1, int p2)
           {
@@ -269,9 +267,6 @@ public class Utils
           }
           if(attr.toString().equals("android:id"))
           {
-            int divisionSignIndex = value.indexOf("/");
-            if(divisionSignIndex >= 0)
-              value.delete(0, divisionSignIndex + 1);
             map.put(value.toString(), tag.toString());
           }
           log(TAG, "=\"" + value.toString() + "\"");
@@ -307,10 +302,17 @@ public class Utils
     sb2.append("private void initView(");
     if(cb_root_view.isChecked()) sb2.append("View view");
     sb2.append(")\n{\n");
+    boolean isAndroidId;
     String clazz;
     String varName;
     for(String id: keySet)
     {
+      // id
+      isAndroidId = id.startsWith("@android:id/");
+      int divisionSignIndex = id.indexOf("/");
+      if(divisionSignIndex >= 0)
+        id = id.substring(divisionSignIndex + 1);
+
       // class
       clazz = map.get(id);
       log(TAG, "class: " + clazz + ", id: " + id);
@@ -341,7 +343,9 @@ public class Utils
 
       // need add root view ?
       if(cb_root_view.isChecked())sb2.append("view.");
-      sb2.append("findViewById(R.id." + id + ");\n");
+      sb2.append("findViewById(");
+      if(isAndroidId) sb2.append("android.");
+      sb2.append("R.id." + id + ");\n");
     }
     sb1.append("\n");
     sb2.append("}");
@@ -354,12 +358,12 @@ public class Utils
   {
     System.out.println(tag + ", " + s);
   }
-  
+
   public static CharSequence getPackagePrefix(Context c, CharSequence suffix)
   {
     String s = getDefSharedPref(c).getString("package_prefix", null);
     if(s == null || s.isEmpty()) s = "com.mycompany.";
-    if (!s.endsWith(".")) s += ".";
+    if(!s.endsWith(".")) s += ".";
     s += suffix.toString().toLowerCase();
     return s;
   }

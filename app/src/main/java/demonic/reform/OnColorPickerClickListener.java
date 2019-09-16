@@ -7,13 +7,13 @@ public class OnColorPickerClickListener implements ColorPickerDialog.a
 {
   Context context;
   String key;
-  
+
   public void setData(Context c, String s)
   {
     context = c;
     key = s;
   }
-  
+
   @Override
   public void a(int color, String colorStr)
   {
