@@ -307,15 +307,15 @@ public class Utils
     String varName;
     for(String id: keySet)
     {
+      // class
+      clazz = map.get(id);
+      log(TAG, "class: " + clazz + ", id: " + id);
+
       // id
       isAndroidId = id.startsWith("@android:id/");
       int divisionSignIndex = id.indexOf("/");
       if(divisionSignIndex >= 0)
         id = id.substring(divisionSignIndex + 1);
-
-      // class
-      clazz = map.get(id);
-      log(TAG, "class: " + clazz + ", id: " + id);
 
       // variable name need add a prefix m ?
       if(cb_add_m.isChecked())
