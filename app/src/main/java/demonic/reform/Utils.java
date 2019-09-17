@@ -333,17 +333,19 @@ public class Utils
         varName = id;
 
       // is private ?
-      if(cb_private.isChecked())sb1.append("private ");
+      if(cb_private.isChecked()) sb1.append("private ");
       sb1.append(clazz + " " + varName + ";\n");
 
-      // need add type conversion ?
+      // need add a type conversion ?
       sb2.append("\t" + varName + " = ");
       if(cb_type_conversion.isChecked())
         sb2.append("(" + clazz + ") ");
 
-      // need add root view ?
-      if(cb_root_view.isChecked())sb2.append("view.");
+      // need add a root view ?
+      if(cb_root_view.isChecked()) sb2.append("view.");
       sb2.append("findViewById(");
+
+      // is default id of android ?
       if(isAndroidId) sb2.append("android.");
       sb2.append("R.id." + id + ");\n");
     }
