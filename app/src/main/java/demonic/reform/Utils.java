@@ -25,7 +25,7 @@ public class Utils
 {
   private static final String TAG = Utils.class.getCanonicalName();
   private static AlertDialog dialog;
-  private static CheckBox cb_private, cb_add_m, cb_root_view, cb_type_conversion;
+  private static CheckBox cb_field, cb_private, cb_add_m, cb_root_view, cb_type_conversion;
   private static SharedPreferences sp;
   private static OnColorPickerClickListener onColorPickerClickListener;
 
@@ -185,15 +185,18 @@ public class Utils
   {
     LinearLayout llt = new LinearLayout(activity);
     llt.setOrientation(LinearLayout.VERTICAL);
+    cb_field = new CheckBox(activity);
     cb_private = new CheckBox(activity);
     cb_add_m = new CheckBox(activity);
     cb_root_view = new CheckBox(activity);
     cb_type_conversion = new CheckBox(activity);
     LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+    llt.addView(cb_field, lp);
     llt.addView(cb_private, lp);
     llt.addView(cb_add_m, lp);
     llt.addView(cb_root_view, lp);
     llt.addView(cb_type_conversion, lp);
+    cb_field.setText("Field");
     cb_private.setText("Private");
     cb_add_m.setText("Add m");
     cb_root_view.setText("Root view");
@@ -297,11 +300,13 @@ public class Utils
       }
     }
     Set keySet = map.keySet();
-    StringBuilder sb1 = new StringBuilder();
-    StringBuilder sb2 = new StringBuilder();
-    sb2.append("private void initView(");
-    if(cb_root_view.isChecked()) sb2.append("View view");
-    sb2.append(")\n{\n");
+    StringBuilder fields = new StringBuilder();
+    StringBuilder method = new StringBuilder();
+    method.append("private void initView(");
+
+    // need add a root view ?
+    if(cb_root_view.isChecked()) method.append("View view");
+    method.append(")\n{\n");
     boolean isAndroidId;
     String clazz;
     String varName;
@@ -333,25 +338,32 @@ public class Utils
         varName = id;
 
       // is private ?
-      if(cb_private.isChecked()) sb1.append("private ");
-      sb1.append(clazz + " " + varName + ";\n");
+      if(cb_private.isChecked()) fields.append("private ");
+      fields.append(clazz + " " + varName + ";\n");
+      method.append('\t');
+
+      // don't create a field ?
+      if(!cb_field.isChecked()) method.append(clazz + " ");
+      method.append(varName + " = ");
 
       // need add a type conversion ?
-      sb2.append("\t" + varName + " = ");
       if(cb_type_conversion.isChecked())
-        sb2.append("(" + clazz + ") ");
+        method.append("(" + clazz + ") ");
 
       // need add a root view ?
-      if(cb_root_view.isChecked()) sb2.append("view.");
-      sb2.append("findViewById(");
+      if(cb_root_view.isChecked()) method.append("view.");
+      method.append("findViewById(");
 
       // is default id of android ?
-      if(isAndroidId) sb2.append("android.");
-      sb2.append("R.id." + id + ");\n");
+      if(isAndroidId) method.append("android.");
+      method.append("R.id." + id + ");\n");
     }
-    sb1.append("\n");
-    sb2.append("}");
-    varName = sb1.toString() + sb2.toString();
+    fields.append("\n");
+    method.append("}");
+    varName = method.toString();
+    // need create fields ?
+    if(cb_field.isChecked())
+      varName = fields.toString() + varName;
     log(TAG, varName);
     return varName;
   }
